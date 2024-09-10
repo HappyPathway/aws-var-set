@@ -23,6 +23,13 @@ data local_file secrets {
   ]
 }
 
-output secrets {
-  value = { for secret in local.aws_secrets : secret => chomp(lookup(data.local_file.secrets, secret).content) }
+locals {
+  secrets = { for secret in local.aws_secrets : secret => chomp(lookup(data.local_file.secrets, secret).content) }
+}
+
+resource "github_actions_organization_secret" "secrets" {
+  for_each = tomap(local.secrets)
+  secret_name     = each.key
+  visibility      = "all"
+  plaintext_value = each.value
 }
