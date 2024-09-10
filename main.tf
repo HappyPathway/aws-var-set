@@ -28,8 +28,13 @@ locals {
 }
 
 resource "github_actions_organization_secret" "secrets" {
-  for_each = tomap(local.secrets)
-  secret_name     = each.key
+  secret_name     = "AWS_SECRET_ACCESS_KEY"
   visibility      = "all"
-  plaintext_value = each.value
+  plaintext_value = lookup(local.secrets, "AWS_SECRET_ACCESS_KEY")
+}
+
+resource "github_actions_organization_variable" "example_variable" {
+  variable_name   = "AWS_ACCESS_KEY_ID"
+  visibility      = "all"
+  value           = lookup(local.secrets, "AWS_ACCESS_KEY_ID")
 }
