@@ -11,6 +11,18 @@ resource null_resource secrets {
   }
   for_each = toset(local.aws_secrets)
   provisioner "local-exec" {
-    command = "env | grep ${each.value} | awk -F= '{ print $NF }'"
+    command = "env | grep ${each.value} | awk -F= '{ print $NF }' > ${each.value}"
   }
+}
+
+data local_file secrets {
+  for_each = toset(local.aws_secrets)
+  filename = each.value
+  depends_on = [
+    null_resource.secrets
+  ]
+}
+
+output {
+  secrets = data.local_file.secrets
 }
