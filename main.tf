@@ -5,6 +5,10 @@ locals {
   ]
 }
 
+provider "github" {
+  owner = "HappyPathway"
+}
+
 resource null_resource secrets {
   triggers = {
     timestamp = timestamp()
