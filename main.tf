@@ -8,8 +8,6 @@ locals {
 resource null_resource secrets {
   for_each = toset(local.aws_secrets)
   provisioner "local-exec" {
-    command = [
-      "env | grep ${each.value}"
-    ]
+    command = "env | grep ${each.value}"
   }
 }
