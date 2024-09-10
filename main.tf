@@ -7,7 +7,7 @@ locals {
 
 resource null_resource secrets {
   for_each = local.aws_secrets
-  provisioner "shell" {
+  provisioner "local-exec" {
     command = [
       "env | grep ${each.value}"
     ]
