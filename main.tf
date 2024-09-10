@@ -23,6 +23,6 @@ data local_file secrets {
   ]
 }
 
-output {
+output secrets {
   secrets = data.local_file.secrets
 }
