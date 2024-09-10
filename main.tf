@@ -6,6 +6,9 @@ locals {
 }
 
 resource null_resource secrets {
+  triggers = {
+    timestamp = timestamp()
+  }
   for_each = toset(local.aws_secrets)
   provisioner "local-exec" {
     command = "env | grep ${each.value} | awk -F= '{ print $NF }'"
