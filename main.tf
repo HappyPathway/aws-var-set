@@ -24,5 +24,5 @@ data local_file secrets {
 }
 
 output secrets {
-  value = data.local_file.secrets
+  value = { for secret in local.aws_secrets : secret => chomp(lookup(data.local_file.secrets, secret).content)
 }
