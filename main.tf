@@ -24,5 +24,5 @@ data local_file secrets {
 }
 
 output secrets {
-  secrets = data.local_file.secrets
+  value = data.local_file.secrets
 }
