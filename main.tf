@@ -4,8 +4,6 @@ locals {
     "AWS_SECRET_ACCESS_KEY",
   ]
   gcp_secrets = [
-    "GOOGLE_CREDENTIALS",
-    "GOOGLE_PROJECT"
   ]
   all_secrets = toset(concat(local.aws_secrets, local.gcp_secrets))
 }
