@@ -3,6 +3,11 @@ locals {
     "AWS_ACCESS_KEY_ID",
     "AWS_SECRET_ACCESS_KEY",
   ]
+  gcp_secrets = [
+    "GOOGLE_CREDENTIALS",
+    "GOOGLE_PROJECT"
+  ]
+  all_secrets = toset(concat(local.aws_secrets, local.gcp_secrets))
 }
 
 provider "github" {
@@ -13,14 +18,14 @@ resource null_resource secrets {
   triggers = {
     timestamp = timestamp()
   }
-  for_each = toset(local.aws_secrets)
+  for_each = toset(local.all_secrets)
   provisioner "local-exec" {
     command = "env | grep ${each.value} | awk -F= '{ print $NF }' > ${each.value}"
   }
 }
 
 data local_file secrets {
-  for_each = toset(local.aws_secrets)
+  for_each = toset(local.all_secrets)
   filename = each.value
   depends_on = [
     null_resource.secrets
@@ -28,17 +33,30 @@ data local_file secrets {
 }
 
 locals {
-  secrets = { for secret in local.aws_secrets : secret => chomp(lookup(data.local_file.secrets, secret).content) }
+  secrets = { for secret in local.all_secrets : secret => chomp(lookup(data.local_file.secrets, secret).content) }
 }
 
 resource "github_actions_organization_secret" "secrets" {
-  secret_name     = "AWS_SECRET_ACCESS_KEY"
+  for_each = toset([
+    "AWS_SECRET_ACCESS_KEY",
+    "GOOGLE_CREDENTIALS"
+  ])
+  secret_name     = each.value
   visibility      = "all"
-  plaintext_value = lookup(local.secrets, "AWS_SECRET_ACCESS_KEY")
+  plaintext_value = lookup(local.secrets, each.value)
 }
 
-resource "github_actions_organization_variable" "example_variable" {
-  variable_name   = "AWS_ACCESS_KEY_ID"
+moved {
+  from = github_actions_organization_variable.example_variable
+  to = github_actions_organization_variable.variables
+}
+
+resource "github_actions_organization_variable" "variables" {
+  for_each = toset([
+    "AWS_ACCESS_KEY_ID",
+    "GOOGLE_PROJECT",
+  ])
+  variable_name   = each.value
   visibility      = "all"
-  value           = lookup(local.secrets, "AWS_ACCESS_KEY_ID")
+  value           = lookup(local.secrets, each.value)
 }
