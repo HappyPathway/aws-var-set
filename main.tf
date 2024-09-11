@@ -36,8 +36,7 @@ locals {
 
 resource "github_actions_organization_secret" "secrets" {
   for_each = toset([
-    "AWS_SECRET_ACCESS_KEY",
-    "GOOGLE_CREDENTIALS"
+    "AWS_SECRET_ACCESS_KEY"
   ])
   secret_name     = each.value
   visibility      = "all"
@@ -51,8 +50,7 @@ moved {
 
 resource "github_actions_organization_variable" "variables" {
   for_each = toset([
-    "AWS_ACCESS_KEY_ID",
-    "GOOGLE_PROJECT",
+    "AWS_ACCESS_KEY_ID"
   ])
   variable_name   = each.value
   visibility      = "all"
