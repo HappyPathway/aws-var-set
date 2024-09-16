@@ -56,3 +56,9 @@ resource "github_actions_organization_variable" "variables" {
   visibility      = "all"
   value           = lookup(local.secrets, each.value)
 }
+
+output aws_credentials {
+  value = {
+    for secret in ["AWS_SECRET_ACCESS_KEY", "AWS_ACCESS_KEY_ID"] : secret => lookup(local.secrets, secret)
+  }
+}
